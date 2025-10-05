@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEICS Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <div class="admin-brand">
+                <h1><i class="fas fa-cogs"></i> GEICS Admin Dashboard</h1>
+            </div>
+            <div class="admin-actions">
+                <button class="btn-primary" onclick="loadAppointments()">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh
+                </button>
+                <a href="/" class="btn-secondary">
+                    <i class="fas fa-home"></i>
+                    Back to Website
+                </a>
+
+
+                <button class="btn-secondary" onclick="logoutAdmin()">
+  <i class="fas fa-right-from-bracket"></i>
+  Logout
+</button>
+<script>
+  async function logoutAdmin() {
+    await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+    location.href = '/login';
+  }
+</script>
+
+            </div>
+        </header>
+
+        <main class="admin-main">
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalAppointments">0</h3>
+                        <p>Total Appointments</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pendingAppointments">0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="confirmedAppointments">0</h3>
+                        <p>Confirmed</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="todayAppointments">0</h3>
+                        <p>Today</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="appointments-section">
+                <div class="section-header">
+                    <h2>Appointment Management</h2>
+                    <div class="filter-tabs">
+                        <button class="tab-btn active" onclick="filterAppointments('all')">All</button>
+                        <button class="tab-btn" onclick="filterAppointments('pending')">Pending</button>
+                        <button class="tab-btn" onclick="filterAppointments('confirmed')">Confirmed</button>
+                    </div>
+                </div>
+
+                <div id="appointmentsContainer" class="appointments-container">
+                    <div class="loading-message">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Loading appointments...
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirm Appointment</h2>
+                <span class="close" onclick="closeConfirmModal()">&times;</span>
+            </div>
+            <form id="confirmForm" class="confirm-form">
+                <input type="hidden" id="appointmentId">
+                <div class="form-group">
+                    <label for="appointmentDate">Appointment Date *</label>
+                    <input type="date" id="appointmentDate" name="appointmentDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentTime">Appointment Time *</label>
+                    <select id="appointmentTime" name="appointmentTime" required>
+                        <option value="">Select Time</option>
+                        <option value="09:00 AM">10:00 AM</option>
+                        <option value="10:00 AM">11:00 AM</option>
+                        <option value="11:00 AM">12:00 AM</option>
+                        <option value="12:00 PM">01:00 PM</option>
+                        <option value="01:00 PM">02:00 PM</option>
+                        <option value="02:00 PM">03:00 PM</option>
+                        <option value="03:00 PM">04:00 PM</option>
+                        <option value="04:00 PM">05:00 PM</option>
+                        <option value="05:00 PM">06:00 PM</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-check"></i>
+                        Confirm & Send Email
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin-script.js"></script>
+</body>
+</html>

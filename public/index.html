@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEICS - Appointment Booking Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <a href="#home" class="logo-link">
+        <img src= "image.png" alt="GEICS Logo" class="nav-logo">
+    </a>
+            </div>
+            <div class="nav-menu">
+                <!-- <a href="#home">Home</a>
+                <a href="#services">Services</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a> -->
+                <button class="btn-appointment" onclick="showAppointmentModal()">Book Appointment</button>
+                <a href="login.html"><button class="btn-appointment">Log in</button>
+</a>
+
+            </div>
+            <div class="nav-toggle" onclick="toggleNavMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Welcome to our Appointment Portal</h1>
+            <p>Expert guidance for students and professionals seeking opportunities abroad. We make your international dreams a reality with personalized consultation services.</p>
+            <div class="hero-buttons">
+                <button class="btn-primary" onclick="showAppointmentModal()">
+                    <i class="fas fa-calendar-plus"></i>
+                    Book Free Consultation
+                </button>
+                <button class="btn-secondary" onclick="scrollToSection('services')">
+                    <i class="fas fa-arrow-down"></i>
+                    Explore Services
+                </button>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Students discussing education abroad">
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Education Consulting</h3>
+                    <p>Expert guidance for university admissions, course selection, and scholarship applications worldwide.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-passport"></i>
+                    </div>
+                    <h3>Visa Assistance</h3>
+                    <p>Complete visa processing support with high success rates for student and work permits.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                    <h3>Immigration Services</h3>
+                    <p>Professional immigration advice for permanent residency and citizenship applications.</p>
+                </div>
+                <!-- <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>Career Support</h3>
+                    <p>Job placement assistance and career counseling for international opportunities.</p>
+                </div> -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Services</h2>
+                <p>Comprehensive solutions for your international education and immigration needs</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <img src="https://images.pexels.com/photos/267507/pexels-photo-267507.jpeg?auto=compress&cs=tinysrgb&w=400" alt="University Campus">
+                    <div class="service-content">
+                        <h3>University Applications</h3>
+                        <ul>
+                            <li>University selection and ranking analysis</li>
+                            <li>Application essay writing support</li>
+                            <li>Document preparation and verification</li>
+                            <li>Scholarship application assistance</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="service-card">
+                    <img src="https://images.pexels.com/photos/4427649/pexels-photo-4427649.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Visa Processing">
+                    <div class="service-content">
+                        <h3>Visa Processing</h3>
+                        <ul>
+                            <li>Student visa applications</li>
+                            <li>Work permit processing</li>
+                            <li>Family reunion visas</li>
+                            <li>Tourist and business visas</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="service-card">
+                    <img src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Immigration Consultation">
+                    <div class="service-content">
+                        <h3>Immigration Consultation</h3>
+                        <ul>
+                            <li>Permanent residency applications</li>
+                            <li>Citizenship guidance</li>
+                            <li>Immigration law consultation</li>
+                            <li>Family sponsorship programs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Countries Section -->
+    <section class="countries">
+        <div class="container">
+            <div class="section-header">
+                <h2>Popular Destinations</h2>
+                <p>We specialize in these top destinations for education and immigration</p>
+            </div>
+            <div class="countries-grid">
+                <div class="country-card">
+                    <img src="https://images.pexels.com/photos/416978/pexels-photo-416978.jpeg?auto=compress&cs=tinysrgb&w=300" alt="Canada">
+                    <div class="country-overlay">
+                        <h3>Canada</h3>
+                        <p>Study permits, Express Entry, PNP programs</p>
+                    </div>
+                </div>
+                <div class="country-card">
+                    <img src="https://images.pexels.com/photos/2073538/pexels-photo-2073538.jpeg?auto=compress&cs=tinysrgb&w=300" alt="Australia">
+                    <div class="country-overlay">
+                        <h3>Australia</h3>
+                        <p>Student visas, Skilled migration, PR pathways</p>
+                    </div>
+                </div>
+                <div class="country-card">
+                    <img src="https://images.pexels.com/photos/164096/pexels-photo-164096.jpeg?auto=compress&cs=tinysrgb&w=300" alt="USA">
+                    <div class="country-overlay">
+                        <h3>United States</h3>
+                        <p>F-1 visas, H-1B, Green Card applications</p>
+                    </div>
+                </div>
+                <div class="country-card">
+                    <img src="https://images.pexels.com/photos/50594/telefonzelle-phone-booth-historic-red-50594.jpeg?auto=compress&cs=tinysrgb&w=300" alt="UK">
+                    <div class="country-overlay">
+                        <h3>United Kingdom</h3>
+                        <p>Student visas, Skilled Worker route</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>About GEICS</h2>
+                    <p>With over a decade of experience in international education and immigration consulting, GEICS has helped thousands of students and professionals achieve their global aspirations.</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <h3>5000+</h3>
+                            <p>Success Stories</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>98%</h3>
+                            <p>Visa Success Rate</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>25+</h3>
+                            <p>Countries Covered</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>10+</h3>
+                            <p>Years Experience</p>
+                        </div>
+                    </div>
+
+                    <div class="why-choose">
+                        <h3>Why Choose GEICS?</h3>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Certified immigration consultants</li>
+                            <li><i class="fas fa-check"></i> Personalized consultation approach</li>
+                            <li><i class="fas fa-check"></i> End-to-end application support</li>
+                            <li><i class="fas fa-check"></i> Regular updates and follow-ups</li>
+                            <li><i class="fas fa-check"></i> Post-arrival assistance</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <img src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Consultation meeting">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2>Success Stories</h2>
+                <p>What our clients say about their experience with GEICS</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"GEICS made my Canadian PR dream come true. Their expert guidance through the Express Entry process was invaluable. Highly recommended!"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <h4>Sarah Johnson</h4>
+                        <span>Software Engineer, Now in Toronto</span>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"Got into my dream university in Australia with full scholarship. The team at GEICS provided excellent support throughout the application process."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <h4>Raj Patel</h4>
+                        <span>Masters Student, University of Melbourne</span>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>"Professional, reliable, and results-oriented. GEICS helped me secure my H-1B visa and provided guidance for my Green Card application."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <h4>Maria Garcia</h4>
+                        <span>Data Analyst, Silicon Valley</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2>Get In Touch</h2>
+                <p>Ready to start your international journey? Contact us today!</p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Office Address</h3>
+                            <p>Hasan Holdings, lift-14 <br> New Eskaton Road<br>Banglamotors<br>Dhaka, 1000</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Phone</h3>
+                            <p>+1 (555) 123-4567<br>Sat - Thur: 10:00 AM - 7:00 PM</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Email</h3>
+                            <p>info@geics.com</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-cta">
+                    <h3>Book Your Free Consultation</h3>
+                    <p>Take the first step towards your international goals. Our expert consultants are ready to guide you through every step of the process.</p>
+                    <button class="btn-primary btn-large" onclick="showAppointmentModal()">
+                        <i class="fas fa-calendar-check"></i>
+                        Schedule Consultation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-brand">
+                        <h3>GEICS</h3>
+                        <p>Global Education & Immigration Consultancy Services</p>
+                    </div>
+                    <div class="footer-social">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Services</h4>
+                        <a href="#">University Applications</a>
+                        <a href="#">Visa Processing</a>
+                        <a href="#">Immigration Consultation</a>
+                        <!-- <a href="#">Career Support</a> -->
+                    </div>
+                    <div class="footer-column">
+                        <h4>Destinations</h4>
+                        <a href="#">Canada</a>
+                        <a href="#">Australia</a>
+                        <a href="#">United States</a>
+                        <a href="#">United Kingdom</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Support</h4>
+                        <a href="#">Contact Us</a>
+                        <a href="#">FAQ</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 GEICS Software Team. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Appointment Modal -->
+    <div id="appointmentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Your Free Consultation</h2>
+                <span class="close" onclick="closeAppointmentModal()">&times;</span>
+            </div>
+            <form id="appointmentForm" class="appointment-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="preferredCountry">Preferred Country *</label>
+                        <select id="preferredCountry" name="preferredCountry" required>
+                            <option value="">Select Country</option>
+                            <option value="Canada">Canada</option>
+                            <option value="Australia">Australia</option>
+                            <option value="United States">United States</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="New Zealand">New Zealand</option>
+                            <option value="Germany">Germany</option>
+                            <option value="Other">Europe</option>
+                            <option value="Other">Other</option>
+
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="consultationType">Consultation Type *</label>
+                    <select id="consultationType" name="consultationType" required>
+                        <option value="">Select Service</option>
+                        <option value="Student Visa">Student Visa</option>
+                        <option value="Work Permit">Work Permit</option>
+                        <option value="Permanent Residency">Permanent Residency</option>
+                        <option value="University Application">University Application</option>
+                        <option value="Immigration Assessment">Immigration Assessment</option>
+                        <option value="General Consultation">General Consultation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">Additional Information</label>
+                    <textarea id="message" name="message" rows="4" placeholder="Please provide any additional details about your requirements..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary btn-full-width">
+                    <i class="fas fa-paper-plane"></i>
+                    Book Appointment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Booking your appointment...</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

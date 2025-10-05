@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GEICS Admin Login</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { background:#f8fafc; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+    .login-wrap { min-height:100vh; display:grid; place-items:center; padding:24px; }
+    .login-card { width:100%; max-width:420px; background:#fff; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.08); padding:28px; }
+    .login-card h1 { margin:0 0 4px; font-size:1.5rem; }
+    .muted { color:#64748b; margin:0 0 20px; }
+    .form-group { margin-bottom:14px; }
+    label { display:block; font-weight:600; margin-bottom:6px; color:#334155; }
+    input { width:100%; padding:12px 14px; border:1px solid #e2e8f0; border-radius:10px; outline:none; }
+    input:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.15); }
+    .btn { width:100%; padding:12px 14px; border:none; border-radius:10px; font-weight:700; cursor:pointer; }
+    .btn-primary { background:#2563eb; color:#fff; }
+    .alert { display:none; margin-bottom:12px; padding:10px 12px; border-radius:10px; font-weight:600; }
+    .alert.error { background:#fee2e2; color:#b91c1c; }
+    .helper { margin-top:12px; font-size:.9rem; color:#64748b; text-align:center; }
+    .brand { display:flex; align-items:center; gap:10px; margin-bottom:12px; color:#2563eb; font-weight:800; }
+  </style>
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="brand"><i class="fas fa-shield-alt"></i> GEICS Admin</div>
+      <h1>Sign in</h1>
+      <p class="muted">Use your admin credentials to access the dashboard.</p>
+
+      <div id="alert" class="alert error"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input id="username" name="username" placeholder="admin" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" placeholder="••••••••" required />
+        </div>
+        <button class="btn btn-primary" type="submit">
+          <i class="fas fa-right-to-bracket"></i> Sign in
+        </button>
+      </form>
+
+      <!-- <p class="helper">Default: <b>admin / admin123</b> &nbsp;—&nbsp; Change these in <code>.env</code>.</p> -->
+    </div>
+  </div>
+
+  <script>
+    // If already logged in, go to admin
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { if (d.authenticated) location.href = '/admin'; });
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const alert = document.getElementById('alert');
+      alert.style.display = 'none';
+
+      const form = new FormData(e.target);
+      const payload = {
+        username: form.get('username').trim(),
+        password: form.get('password')
+      };
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert.textContent = data.error || 'Login failed';
+          alert.style.display = 'block';
+          return;
+        }
+        // success
+        location.href = '/admin';
+      } catch (err) {
+        alert.textContent = 'Network error. Please try again.';
+        alert.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
