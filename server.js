@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -10,11 +11,16 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* ------------------------- Middleware ------------------------- */
+/* ------------------------- CORS + Session for cross-site ------------------------- */
+// IMPORTANT: your frontend lives at https://appointments.geics.net
+// Your backend is on Render (https://<your-app>.onrender.com)
+app.set('trust proxy', 1); // required behind Render's proxy to set secure cookies
+
 app.use(cors({
-  origin: true,
-  credentials: true,
+  origin: ['https://appointments.geics.net'], // your frontend origin
+  credentials: true
 }));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -25,12 +31,13 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    sameSite: 'lax',
-    // secure: true, // enable this when using HTTPS
-    maxAge: 1000 * 60 * 60 * 8, // 8 hours
+    sameSite: 'none',     // allow cross-site cookies
+    secure: true,         // only over HTTPS (Render provides HTTPS)
+    maxAge: 1000 * 60 * 60 * 8 // 8 hours
   }
 }));
 
+// You can keep this; it won't hurt if you don't host static files on Render
 app.use(express.static(path.join(__dirname, 'public')));
 
 /* ------------------- MongoDB (with graceful fallback) ------------------- */
@@ -76,7 +83,7 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: process.env.EMAIL_USER, // your Gmail
+    user: process.env.EMAIL_USER, // Gmail address
     pass: process.env.EMAIL_PASS  // 16-char app password
   }
 });
@@ -103,7 +110,7 @@ function authRequired(req, res, next) {
 }
 
 /* -------------------------------- Routes ------------------------------- */
-// Public pages
+// Public pages (kept for convenience; frontend is actually on cPanel)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -146,7 +153,7 @@ app.post('/api/logout', (req, res) => {
 });
 
 /* ---------------------------- Appointments API ---------------------------- */
-// Public: create appointment (no email here)
+// Public: create appointment
 app.post('/api/appointments', async (req, res) => {
   try {
     if (isMongoConnected) {
@@ -253,7 +260,7 @@ app.put('/api/appointments/:id/confirm', authRequired, async (req, res) => {
 
       await transporter.sendMail({
         from: mailFrom(),
-        to: appointment.email,                 // <-- client’s email from the form
+        to: appointment.email,                 // client's email from the form
         replyTo: process.env.REPLY_TO || process.env.EMAIL_USER,
         subject: 'Appointment Confirmed - GEICS Consultancy',
         html
