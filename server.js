@@ -3,13 +3,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
 const path = require('path');
 const session = require('express-session');
-const dns = require('dns');                 // <-- added
+const dns = require('dns');
+const { Resend } = require('resend');
 require('dotenv').config();
 
-// Force IPv4 first to avoid IPv6 timeouts on some hosts (Render/free tiers often)
+// Avoid odd IPv6 resolver behavior on some hosts
 dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
@@ -82,37 +82,22 @@ const appointmentSchema = new mongoose.Schema({
 });
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 
-/* --------------------------- Email Transport (Gmail) --------------------------- */
-// Use port 587 with STARTTLS, force IPv4 sockets, add timeouts/pooling for Render reliability
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,            // STARTTLS
-  auth: {
-    user: process.env.EMAIL_USER, // Gmail address
-    pass: process.env.EMAIL_PASS  // 16-char Gmail App Password
-  },
-  requireTLS: true,
-  pool: true,
-  maxConnections: 3,
-  maxMessages: 50,
-  connectionTimeout: 15000,
-  socketTimeout: 20000,
-  family: 4                 // <-- force IPv4
-});
+/* --------------------------- Resend (Email API) --------------------------- */
+const resend = new Resend(process.env.RESEND_API_KEY);
+const RESEND_FROM = process.env.RESEND_FROM || 'GEICS Consultancy <onboarding@resend.dev>';
+const REPLY_TO = process.env.REPLY_TO || undefined;
 
-// Optional: uncomment for verbose SMTP logs while debugging
-// transporter.set('logger', true);
-// transporter.set('debug', true);
-
-transporter.verify(err => {
-  if (err) console.error('SMTP error:', err.message);
-  else console.log('SMTP ready');
-});
-
-function mailFrom() {
-  const name = process.env.FROM_NAME || 'GEICS Consultancy';
-  return `"${name}" <${process.env.EMAIL_USER}>`;
+// Helper to send email via Resend
+async function sendEmail({ to, subject, html }) {
+  const { data, error } = await resend.emails.send({
+    from: RESEND_FROM,
+    to,
+    subject,
+    html,
+    ...(REPLY_TO ? { reply_to: REPLY_TO } : {})
+  });
+  if (error) throw new Error(error.message || String(error));
+  return data;
 }
 
 /* ----------------------------- Auth Helpers ---------------------------- */
@@ -121,6 +106,7 @@ const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
 
 function authRequired(req, res, next) {
   if (req.session && req.session.user === ADMIN_USER) return next();
+  // For API calls: 401; for pages: redirect to /login
   if (req.accepts('html')) return res.redirect('/login');
   return res.status(401).json({ error: 'Unauthorized' });
 }
@@ -233,58 +219,55 @@ app.put('/api/appointments/:id/confirm', authRequired, async (req, res) => {
 
     if (!appointment) return res.status(404).json({ error: 'Appointment not found' });
 
-    // Send email to the client's email provided in the booking form
-    try {
-      const html = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background-color: #2563eb; padding: 20px; text-align: center;">
-            <h1 style="color: white; margin: 0;">GEICS Consultancy</h1>
-            <p style="color: #e5e7eb; margin: 5px 0;">Global Education & Immigration Consultancy Services</p>
+    // Build email HTML
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #2563eb; padding: 20px; text-align: center;">
+          <h1 style="color: white; margin: 0;">GEICS Consultancy</h1>
+          <p style="color: #e5e7eb; margin: 5px 0;">Global Education & Immigration Consultancy Services</p>
+        </div>
+        <div style="padding: 30px; background-color: #f8fafc;">
+          <h2 style="color: #1e40af;">Appointment Confirmed!</h2>
+          <p>Dear ${appointment.name},</p>
+          <p>Your appointment has been confirmed. Please find the details below:</p>
+          
+          <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="color: #2563eb; margin-top: 0;">Appointment Details</h3>
+            <p><strong>Date:</strong> ${new Date(appointmentDate).toLocaleDateString()}</p>
+            <p><strong>Time:</strong> ${appointmentTime}</p>
+            <p><strong>Consultation Type:</strong> ${appointment.consultationType}</p>
+            <p><strong>Preferred Country:</strong> ${appointment.preferredCountry}</p>
           </div>
-          <div style="padding: 30px; background-color: #f8fafc;">
-            <h2 style="color: #1e40af;">Appointment Confirmed!</h2>
-            <p>Dear ${appointment.name},</p>
-            <p>Your appointment has been confirmed. Please find the details below:</p>
-            
-            <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h3 style="color: #2563eb; margin-top: 0;">Appointment Details</h3>
-              <p><strong>Date:</strong> ${new Date(appointmentDate).toLocaleDateString()}</p>
-              <p><strong>Time:</strong> ${appointmentTime}</p>
-              <p><strong>Consultation Type:</strong> ${appointment.consultationType}</p>
-              <p><strong>Preferred Country:</strong> ${appointment.preferredCountry}</p>
-            </div>
 
-            <div style="background-color: #dbeafe; padding: 15px; border-radius: 8px; margin: 20px 0;">
-              <h4 style="color: #1e40af; margin-top: 0;">Office Address</h4>
-              <p style="margin: 5px 0;">GEICS Consultancy Office</p>
-              <p style="margin: 5px 0;">123 Business District</p>
-              <p style="margin: 5px 0;">Your City, Your Country</p>
-              <p style="margin: 5px 0;">Phone: +1 (555) 123-4567</p>
-            </div>
+          <div style="background-color: #dbeafe; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <h4 style="color: #1e40af; margin-top: 0;">Office Address</h4>
+            <p style="margin: 5px 0;">GEICS Consultancy Office</p>
+            <p style="margin: 5px 0;">123 Business District</p>
+            <p style="margin: 5px 0;">Your City, Your Country</p>
+            <p style="margin: 5px 0;">Phone: +1 (555) 123-4567</p>
+          </div>
 
-            <p>Please arrive 10 minutes early. For reschedules, reply to this email at least 24 hours in advance.</p>
-            <p>Thank you for choosing GEICS Consultancy!</p>
+          <p>Please arrive 10 minutes early. For reschedules, reply to this email at least 24 hours in advance.</p>
+          <p>Thank you for choosing GEICS Consultancy!</p>
 
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-              <p style="color: #6b7280; font-size: 14px;">
-                Best regards,<br>
-                GEICS Consultancy Team<br>
-                Email: info@geics.com<br>
-                Phone: +1 (555) 123-4567
-              </p>
-            </div>
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280; font-size: 14px;">
+              Best regards,<br>
+              GEICS Consultancy Team<br>
+              Email: info@geics.com<br>
+              Phone: +1 (555) 123-4567
+            </p>
           </div>
         </div>
-      `;
+      </div>
+    `;
 
-      await transporter.sendMail({
-        from: mailFrom(),
-        to: appointment.email,                 // client's email from the form
-        replyTo: process.env.REPLY_TO || process.env.EMAIL_USER,
+    try {
+      await sendEmail({
+        to: appointment.email, // client's email from the form
         subject: 'Appointment Confirmed - GEICS Consultancy',
         html
       });
-
       return res.json({ message: 'Appointment confirmed and email sent!' });
     } catch (emailErr) {
       console.log('Email sending failed:', emailErr.message);
@@ -313,16 +296,15 @@ app.delete('/api/appointments/:id', authRequired, async (req, res) => {
   }
 });
 
-/* ------------------------- Optional: SMTP Test ------------------------- */
+/* ------------------------- Email test (Resend) ------------------------- */
 app.get('/api/test-email', async (_req, res) => {
   try {
-    await transporter.sendMail({
-      from: mailFrom(),
-      to: process.env.REPLY_TO || process.env.EMAIL_USER,
-      subject: 'SMTP Test – GEICS',
-      text: 'If you received this, SMTP is working ✅'
+    const data = await sendEmail({
+      to: process.env.ADMIN_NOTIFY_TO || process.env.REPLY_TO,
+      subject: 'Test – GEICS via Resend',
+      html: '<p>If you received this, Resend is working ✅</p>'
     });
-    res.json({ ok: true });
+    res.json({ ok: true, id: data?.id || null });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }
