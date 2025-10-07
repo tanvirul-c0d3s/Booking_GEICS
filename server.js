@@ -6,7 +6,11 @@ const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const path = require('path');
 const session = require('express-session');
+const dns = require('dns');                 // <-- added
 require('dotenv').config();
+
+// Force IPv4 first to avoid IPv6 timeouts on some hosts (Render/free tiers often)
+dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,8 +20,9 @@ const PORT = process.env.PORT || 3000;
 // Your backend is on Render (https://<your-app>.onrender.com)
 app.set('trust proxy', 1); // required behind Render's proxy to set secure cookies
 
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'https://appointments.geics.net';
 app.use(cors({
-  origin: ['https://appointments.geics.net'], // your frontend origin
+  origin: [FRONTEND_ORIGIN],
   credentials: true
 }));
 
@@ -78,22 +83,27 @@ const appointmentSchema = new mongoose.Schema({
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 
 /* --------------------------- Email Transport (Gmail) --------------------------- */
+// Use port 587 with STARTTLS, force IPv4 sockets, add timeouts/pooling for Render reliability
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 587,           // ✅ Render friendly
-  secure: false,       // ✅ use STARTTLS
+  port: 587,
+  secure: false,            // STARTTLS
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: process.env.EMAIL_USER, // Gmail address
+    pass: process.env.EMAIL_PASS  // 16-char Gmail App Password
   },
   requireTLS: true,
   pool: true,
   maxConnections: 3,
   maxMessages: 50,
   connectionTimeout: 15000,
-  socketTimeout: 20000
+  socketTimeout: 20000,
+  family: 4                 // <-- force IPv4
 });
 
+// Optional: uncomment for verbose SMTP logs while debugging
+// transporter.set('logger', true);
+// transporter.set('debug', true);
 
 transporter.verify(err => {
   if (err) console.error('SMTP error:', err.message);
@@ -111,12 +121,14 @@ const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
 
 function authRequired(req, res, next) {
   if (req.session && req.session.user === ADMIN_USER) return next();
-  // For API calls: 401; for pages: redirect to /login
   if (req.accepts('html')) return res.redirect('/login');
   return res.status(401).json({ error: 'Unauthorized' });
 }
 
 /* -------------------------------- Routes ------------------------------- */
+// Health ping for Render
+app.get('/healthz', (_req, res) => res.json({ ok: true }));
+
 // Public pages (kept for convenience; frontend is actually on cPanel)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
