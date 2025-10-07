@@ -77,16 +77,23 @@ const appointmentSchema = new mongoose.Schema({
 });
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 
-/* --------------------------- Email Transport (Gmail SMTP) --------------------------- */
+/* --------------------------- Email Transport (Gmail) --------------------------- */
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  port: 587,           // ✅ Render friendly
+  secure: false,       // ✅ use STARTTLS
   auth: {
-    user: process.env.EMAIL_USER, // Gmail address
-    pass: process.env.EMAIL_PASS  // 16-char app password
-  }
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  },
+  requireTLS: true,
+  pool: true,
+  maxConnections: 3,
+  maxMessages: 50,
+  connectionTimeout: 15000,
+  socketTimeout: 20000
 });
+
 
 transporter.verify(err => {
   if (err) console.error('SMTP error:', err.message);
