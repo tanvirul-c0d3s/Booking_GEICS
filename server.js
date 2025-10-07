@@ -242,9 +242,9 @@ app.put('/api/appointments/:id/confirm', authRequired, async (req, res) => {
           <div style="background-color: #dbeafe; padding: 15px; border-radius: 8px; margin: 20px 0;">
             <h4 style="color: #1e40af; margin-top: 0;">Office Address</h4>
             <p style="margin: 5px 0;">GEICS Consultancy Office</p>
-            <p style="margin: 5px 0;">123 Business District</p>
-            <p style="margin: 5px 0;">Your City, Your Country</p>
-            <p style="margin: 5px 0;">Phone: +1 (555) 123-4567</p>
+            <p style="margin: 5px 0;">Hasan Holdings Ltd, Lift-14</p>
+            <p style="margin: 5px 0;">New Eskaton Road, Banglamotor, Dhaka 1000, Bangladesh</p>
+            <p style="margin: 5px 0;">Phone: 01901-167092</p>
           </div>
 
           <p>Please arrive 10 minutes early. For reschedules, reply to this email at least 24 hours in advance.</p>
